@@ -54,20 +54,17 @@ function switch_php() {
     fi
 }
 
-CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d".")
+CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d"." )
+AVAILABLE_PHP_VERSIONS=$(ls /usr/bin/php* | grep -oP 'php([0-9]+\.[0-9]+)' | sed 's/php//g' | sort -rV | uniq)
 
-options=(
-    "Cancel, stay on PHP $CURRENT_PHP_VERSION"
-    "8.3"
-    "8.2"
-    "8.1"
-    "8.0"
-    "7.4"
-    "7.3"
-    "7.2"
-    "7.1"
-    "7.0"
-    "5.6"
-)
+options=("Cancel, stay on PHP $CURRENT_PHP_VERSION")
+
+# Filter out the current PHP version because switching to the same version gives unexpected results
+for version in $AVAILABLE_PHP_VERSIONS
+do
+    if [ "$version" != "$CURRENT_PHP_VERSION" ]; then
+        options+=("$version")
+    fi
+done
 
 switch_php "Switch to PHP-version:" selected_choice "${options[@]}"
