@@ -1,17 +1,13 @@
 #!/bin/bash
 
-echo "* Refreshing software repositories..."
-sudo add-apt-repository ppa:ondrej/php
-sudo apt-get update
-
-echo "* Installing prerequisite software packages..."
-sudo apt-get install -y software-properties-common
-
 echo "* Setting up third-party repository to allow installation of multiple PHP versions..."
 sudo add-apt-repository -y ppa:ondrej/php
 
 echo "* Refreshing software repositories..."
 sudo apt-get update
+
+echo "* Installing prerequisite software packages..."
+sudo apt-get install -y software-properties-common
 
 echo "* Installing PHP 5.6..."
 sudo apt-get install -y php5.6 php5.6-common php5.6-cli
@@ -73,21 +69,27 @@ sudo apt-get install -y php8.3 php8.3-common php8.3-cli
 echo "* Installing PHP 8.3 extensions..."
 sudo apt-get install -y php8.3-bz2 php8.3-curl php8.3-gd php8.3-mbstring php8.3-mysql php8.3-opcache php8.3-readline php8.3-soap php8.3-sqlite3 php8.3-tidy php8.3-xml php8.3-xsl php8.3-zip php8.3-intl php8.3-redis
 
+echo "* Installing PHP 8.4..."
+sudo apt-get install -y php8.4 php8.4-common php8.4-cli
+
+echo "* Installing PHP 8.4 extensions..."
+sudo apt-get install -y php8.4-bz2 php8.4-curl php8.4-gd php8.4-mbstring php8.4-mysql php8.4-opcache php8.4-readline php8.4-soap php8.4-sqlite3 php8.4-tidy php8.4-xml php8.4-xsl php8.4-zip php8.4-intl php8.4-redis
+
 echo "* Installing memcached extensions..."
-sudo apt-get install -y memcached php-memcache php-memcached php7.0-memcached php7.1-memcached php7.2-memcached php7.3-memcached php7.4-memcached php8.0-memcached php8.1-memcached php8.2-memcached php8.3-memcached
+sudo apt-get install -y memcached php-memcache php-memcached php7.0-memcached php7.1-memcached php7.2-memcached php7.3-memcached php7.4-memcached php8.0-memcached php8.1-memcached php8.2-memcached php8.3-memcached php8.4-memcached
 
 echo "* Installing imap extensions..."
-sudo apt-get install -y php-imap php7.2-imap php7.3-imap php7.4-imap php8.0-imap php8.1-imap php8.2-imap php8.3-imap
+sudo apt-get install -y php-imap php7.2-imap php7.3-imap php7.4-imap php8.0-imap php8.1-imap php8.2-imap php8.3-imap php8.4-imap
 
 echo "* Installing php-common and gcc..."
 sudo apt-get install php php-common gcc
 
 echo "* Installing imagemagick/imagick extensions..."
 sudo apt-get install imagemagick
-sudo apt-get install php-imagick php5.6-imagick php7.0-imagick php7.1-imagick php7.2-imagick php7.3-imagick php7.4-imagick php8.0-imagick php8.1-imagick php8.2-imagick php8.3-imagick
+sudo apt-get install php-imagick php5.6-imagick php7.0-imagick php7.1-imagick php7.2-imagick php7.3-imagick php7.4-imagick php8.0-imagick php8.1-imagick php8.2-imagick php8.3-imagick php8.4-imagick
 
 echo "* Installing PHP-FPM..."
-sudo apt-get install php5.6-fpm php7.0-fpm php7.1-fpm php7.2-fpm php7.3-fpm php7.4-fpm  php8.0-fpm php8.1-fpm php8.2-fpm php8.3-fpm
+sudo apt-get install php5.6-fpm php7.0-fpm php7.1-fpm php7.2-fpm php7.3-fpm php7.4-fpm  php8.0-fpm php8.1-fpm php8.2-fpm php8.3-fpm php8.4-fpm
 
 echo "* Enabeling mod_rewrite, mod_headers and vhost_alias..."
 sudo a2enmod rewrite
@@ -115,6 +117,7 @@ sudo ln -s ~/php.ini /etc/php/8.0/mods-available/php.ini
 sudo ln -s ~/php.ini /etc/php/8.1/mods-available/php.ini
 sudo ln -s ~/php.ini /etc/php/8.2/mods-available/php.ini
 sudo ln -s ~/php.ini /etc/php/8.3/mods-available/php.ini
+sudo ln -s ~/php.ini /etc/php/8.4/mods-available/php.ini
 
 sudo phpenmod php
 
