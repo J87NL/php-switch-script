@@ -38,6 +38,7 @@ echo "Selected PHP versions: $selected_versions"
 php_extensions=(
     "bz2" "Enable BZ2 extension" ON
     "curl" "Enable cURL extension" ON
+    "fpm" "Enable FPM extension" ON
     "gd" "Enable GD (graphics) extension" ON
     "intl" "Enable Internationalization extension" ON
     "mbstring" "Enable Multibyte String extension" ON
