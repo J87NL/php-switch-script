@@ -80,18 +80,21 @@ sudo a2enmod actions alias proxy_fcgi fcgid
 
 echo "* Installing selected PHP versions..."
 
-IFS=',' read -r -a selected_versions_array <<< "$selected_versions"
+IFS=', ' read -r -a selected_versions_array <<< "$selected_versions"
+IFS=', ' read -r -a selected_extensions_array <<< "$selected_extensions"
+
 for version in "${selected_versions_array[@]}"; do
-    version=${version//\"/}  # Remove quotes around version
-    if [[ $version != " " ]]; then
+    version=${version//\"/}
+    if [[ -n "$version" ]]; then
         echo "* Installing PHP version $version..."
         sudo apt-get install -y "php$version php$version-common php$version-cli"
 
-        # Install selected extensions for the PHP version
-        for ext in "${selected_extensions[@]}"; do
-            ext=${ext//\"/}  # Remove quotes
-            echo "* Installing PHP extension $ext for PHP $version..."
-            sudo apt-get install -y "php$version-$ext"
+        for ext in "${selected_extensions_array[@]}"; do
+            ext=${ext//\"/}
+            if [[ -n "$ext" ]]; then
+                echo "* Installing PHP extension $ext for PHP $version..."
+                sudo apt-get install -y "php$version-$ext"
+            fi
         done
     fi
 done
@@ -109,7 +112,7 @@ if (whiptail --title "Add php.ini for PHP Versions" --yesno "Do you want to add 
     fi
 
     for version in "${selected_versions_array[@]}"; do
-        version=${version//\"/}  # Remove quotes around version
+        version=${version//\"/}
         if [[ $version != " " ]]; then
             echo "* Create a symlink php.ini for PHP version $version..."
 
