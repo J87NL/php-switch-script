@@ -1,5 +1,70 @@
 #!/bin/bash
 
+php_versions=(
+    "8.4" "PHP 8.4" ON
+    "8.3" "PHP 8.3" ON
+    "8.2" "PHP 8.2" OFF
+    "8.1" "PHP 8.1" OFF
+    "8.0" "PHP 8.0" OFF
+    "7.4" "PHP 7.4" ON
+    "7.3" "PHP 7.3" OFF
+    "7.2" "PHP 7.2" OFF
+    "7.1" "PHP 7.1" OFF
+    "7.0" "PHP 7.0" OFF
+    "5.6" "PHP 5.6" OFF
+)
+
+if ! command -v whiptail &> /dev/null; then
+    if (whiptail --title "Install whiptail" --yesno "whiptail is not installed. Do you want to install it?" 8 50); then
+        echo "* Installing whiptail..."
+        sudo apt-get install -y whiptail
+    else
+        echo "whiptail is required to continue. Exiting installation."
+        exit 1
+    fi
+fi
+
+selected_versions=$(whiptail --title "PHP Version Selection" --checklist \
+    "Select PHP versions to install" 20 50 10 \
+    "${php_versions[@]}" 3>&1 1>&2 2>&3)
+
+if [[ $? -ne 0 || -z "$selected_versions" ]]; then
+    echo "Installation cancelled or no version selected."
+    exit 1
+fi
+
+echo "Selected PHP versions: $selected_versions"
+
+php_extensions=(
+    "bz2" "Enable BZ2 extension" ON
+    "curl" "Enable cURL extension" ON
+    "gd" "Enable GD (graphics) extension" ON
+    "intl" "Enable Internationalization extension" ON
+    "mbstring" "Enable Multibyte String extension" ON
+    "mysql" "Enable MySQL extension" ON
+    "opcache" "Enable OPCACHE extension" ON
+    "pdo" "Enable PDO (database abstraction) extension" ON
+    "readline" "Enable READLINE extension" ON
+    "redis" "Enable REDIS extension" ON
+    "soap" "Enable SOAP extension" ON
+    "sqlite3" "Enable SQLITE3 extension" ON
+    "tidy" "Enable TIDY extension" ON
+    "xml" "Enable XML extension" ON
+    "xsl" "Enable XSL extension" ON
+    "zip" "Enable ZIP extension" ON
+)
+
+selected_extensions=$(whiptail --title "PHP Extensions Selection" --checklist \
+    "Select PHP extensions to install" 20 100 10 \
+    "${php_extensions[@]}" 3>&1 1>&2 2>&3)
+
+if [[ $? -ne 0 ]]; then
+    echo "Installation cancelled."
+    exit 1
+fi
+
+echo "Selected extensions: $selected_extensions"
+
 echo "* Setting up third-party repository to allow installation of multiple PHP versions..."
 sudo add-apt-repository -y ppa:ondrej/php
 
@@ -9,119 +74,50 @@ sudo apt-get update
 echo "* Installing prerequisite software packages..."
 sudo apt-get install -y software-properties-common
 
-echo "* Installing PHP 5.6..."
-sudo apt-get install -y php5.6 php5.6-common php5.6-cli
+echo "* Installing Apache FastCGI module..."
+sudo apt-get install -y libapache2-mod-fcgid
+sudo a2enmod actions alias proxy_fcgi fcgid
 
-echo "* Installing PHP 5.6 extensions..."
-sudo apt-get install -y php5.6-curl php5.6-mcrypt php5.6-soap php5.6-bz2 php5.6-gd php5.6-mysql php5.6-sqlite3 php5.6-json php5.6-opcache php5.6-xml php5.6-mbstring php5.6-readline php5.6-xmlrpc php5.6-zip php5.6-intl php5.6-redis
+echo "* Installing selected PHP versions..."
 
-echo "* Installing PHP 7.0..."
-sudo apt-get install -y php7.0 php7.0-common php7.0-cli
+IFS=',' read -r -a selected_versions_array <<< "$selected_versions"
+for version in "${selected_versions_array[@]}"; do
+    version=${version//\"/}  # Remove quotes around version
+    if [[ $version != " " ]]; then
+        echo "* Installing PHP version $version..."
+        sudo apt-get install -y "php$version php$version-common php$version-cli"
 
-echo "* Installing PHP 7.0 extensions..."
-sudo apt-get install -y php7.0-gd php7.0-mysql php7.0-sqlite3 php7.0-soap php7.0-xsl php7.0-json php7.0-opcache php7.0-mbstring php7.0-readline php7.0-curl php7.0-mcrypt php7.0-xml php7.0-zip php7.0-intl php7.0-redis
-
-echo "* Installing PHP 7.1..."
-sudo apt-get install -y php7.1 php7.1-common php7.1-cli
-
-echo "* Installing PHP 7.1 extensions..."
-sudo apt-get install -y php7.1-gd php7.1-mysql php7.1-sqlite3 php7.1-soap php7.1-xsl php7.1-json php7.1-opcache php7.1-mbstring php7.1-readline php7.1-curl php7.1-mcrypt php7.1-xml php7.1-zip php7.1-intl php7.1-redis
-
-echo "* Installing PHP 7.2..."
-sudo apt-get install -y php7.2 php7.2-common php7.2-cli
-
-echo "* Installing PHP 7.2 extensions..."
-sudo apt-get install -y php7.2-bz2 php7.2-curl php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-opcache php7.2-readline php7.2-soap php7.2-sqlite3 php7.2-tidy php7.2-xml php7.2-xsl php7.2-zip php7.2-intl php7.2-redis
-
-echo "* Installing PHP 7.3..."
-sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-
-echo "* Installing PHP 7.3 extensions..."
-sudo apt-get install -y php7.3-bz2 php7.3-curl php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-opcache php7.3-readline php7.3-soap php7.3-sqlite3 php7.3-tidy php7.3-xml php7.3-xsl php7.3-zip php7.3-intl php7.3-redis
-
-echo "* Installing PHP 7.4..."
-sudo apt-get install -y php7.4 php7.4-common php7.4-cli
-
-echo "* Installing PHP 7.4 extensions..."
-sudo apt-get install -y php7.4-bz2 php7.4-curl php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-soap php7.4-sqlite3 php7.4-tidy php7.4-xml php7.4-xsl php7.4-zip php7.4-intl php7.4-redis
-
-echo "* Installing PHP 8.0..."
-sudo apt-get install -y php8.0 php8.0-common php8.0-cli
-
-echo "* Installing PHP 8.0 extensions..."
-sudo apt-get install -y php8.0-bz2 php8.0-curl php8.0-gd php8.0-mbstring php8.0-mysql php8.0-opcache php8.0-readline php8.0-soap php8.0-sqlite3 php8.0-tidy php8.0-xml php8.0-xsl php8.0-zip php8.0-intl php8.0-redis
-
-echo "* Installing PHP 8.1..."
-sudo apt-get install -y php8.1 php8.1-common php8.1-cli
-
-echo "* Installing PHP 8.1 extensions..."
-sudo apt-get install -y php8.1-bz2 php8.1-curl php8.1-gd php8.1-mbstring php8.1-mysql php8.1-opcache php8.1-readline php8.1-soap php8.1-sqlite3 php8.1-tidy php8.1-xml php8.1-xsl php8.1-zip php8.1-intl php8.1-redis
-
-echo "* Installing PHP 8.2..."
-sudo apt-get install -y php8.2 php8.2-common php8.2-cli
-
-echo "* Installing PHP 8.2 extensions..."
-sudo apt-get install -y php8.2-bz2 php8.2-curl php8.2-gd php8.2-mbstring php8.2-mysql php8.2-opcache php8.2-readline php8.2-soap php8.2-sqlite3 php8.2-tidy php8.2-xml php8.2-xsl php8.2-zip php8.2-intl php8.2-redis
-
-echo "* Installing PHP 8.3..."
-sudo apt-get install -y php8.3 php8.3-common php8.3-cli
-
-echo "* Installing PHP 8.3 extensions..."
-sudo apt-get install -y php8.3-bz2 php8.3-curl php8.3-gd php8.3-mbstring php8.3-mysql php8.3-opcache php8.3-readline php8.3-soap php8.3-sqlite3 php8.3-tidy php8.3-xml php8.3-xsl php8.3-zip php8.3-intl php8.3-redis
-
-echo "* Installing PHP 8.4..."
-sudo apt-get install -y php8.4 php8.4-common php8.4-cli
-
-echo "* Installing PHP 8.4 extensions..."
-sudo apt-get install -y php8.4-bz2 php8.4-curl php8.4-gd php8.4-mbstring php8.4-mysql php8.4-opcache php8.4-readline php8.4-soap php8.4-sqlite3 php8.4-tidy php8.4-xml php8.4-xsl php8.4-zip php8.4-intl php8.4-redis
-
-echo "* Installing memcached extensions..."
-sudo apt-get install -y memcached php-memcache php-memcached php7.0-memcached php7.1-memcached php7.2-memcached php7.3-memcached php7.4-memcached php8.0-memcached php8.1-memcached php8.2-memcached php8.3-memcached php8.4-memcached
-
-echo "* Installing imap extensions..."
-sudo apt-get install -y php-imap php7.2-imap php7.3-imap php7.4-imap php8.0-imap php8.1-imap php8.2-imap php8.3-imap php8.4-imap
-
-echo "* Installing php-common and gcc..."
-sudo apt-get install php php-common gcc
-
-echo "* Installing imagemagick/imagick extensions..."
-sudo apt-get install imagemagick
-sudo apt-get install php-imagick php5.6-imagick php7.0-imagick php7.1-imagick php7.2-imagick php7.3-imagick php7.4-imagick php8.0-imagick php8.1-imagick php8.2-imagick php8.3-imagick php8.4-imagick
-
-echo "* Installing PHP-FPM..."
-sudo apt-get install php5.6-fpm php7.0-fpm php7.1-fpm php7.2-fpm php7.3-fpm php7.4-fpm  php8.0-fpm php8.1-fpm php8.2-fpm php8.3-fpm php8.4-fpm
+        # Install selected extensions for the PHP version
+        for ext in "${selected_extensions[@]}"; do
+            ext=${ext//\"/}  # Remove quotes
+            echo "* Installing PHP extension $ext for PHP $version..."
+            sudo apt-get install -y "php$version-$ext"
+        done
+    fi
+done
 
 echo "* Enabeling mod_rewrite, mod_headers and vhost_alias..."
 sudo a2enmod rewrite
 sudo a2enmod headers
 sudo a2enmod vhost_alias
 
-sudo apt-get install libapache2-mod-fcgid
-sudo apt install software-properties-common
-sudo a2enmod actions alias proxy_fcgi fcgid
+if (whiptail --title "Add php.ini for PHP Versions" --yesno "Do you want to add a custom php.ini file to your home directory and create symlinks for the selected PHP versions?" 8 50); then
+    echo "* Add an php.ini to your home folder for easy adding of settings to all PHP-versions..."
+    ini_file=~/php.ini
+    if ! grep -q "^memory_limit" "$ini_file"; then
+        echo "memory_limit = 2G" >> "$ini_file"
+    fi
 
-echo "* Add an php.ini to your home folder for easy adding of settings to all PHP-versions..."
-ini_file=~/php.ini
-if ! grep -q "^memory_limit" "$ini_file"; then
-    echo "memory_limit = 2G" >> "$ini_file"
+    for version in "${selected_versions_array[@]}"; do
+        version=${version//\"/}  # Remove quotes around version
+        if [[ $version != " " ]]; then
+            echo "* Create a symlink php.ini for PHP version $version..."
+
+            if [ ! -L "/etc/php/$version/mods-available/php.ini" ]; then
+                sudo ln -s ~/php.ini "/etc/php/$version/mods-available/php.ini"
+            fi
+        fi
+    done
 fi
 
-echo "* Symlink php.ini for every PHP-version..."
-sudo ln -s ~/php.ini /etc/php/5.6/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/7.0/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/7.1/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/7.2/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/7.3/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/7.4/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/8.0/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/8.1/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/8.2/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/8.3/mods-available/php.ini
-sudo ln -s ~/php.ini /etc/php/8.4/mods-available/php.ini
-
-sudo phpenmod php
-
-echo "* Restart apache..."
-sudo systemctl restart apache2
-
-echo "* Setup complete. You may now use the 'switch-php.sh' script."
+echo "* Installation complete."

@@ -54,7 +54,7 @@ function switch_php() {
     fi
 }
 
-CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d"." )
+CURRENT_PHP_VERSION=$(php -v | head -n 1 | cut -d " " -f 2 | cut -f1-2 -d".")
 AVAILABLE_PHP_VERSIONS=$(ls /usr/bin/php* | grep -oP 'php([0-9]+\.[0-9]+)' | sed 's/php//g' | sort -rV | uniq)
 
 options=("Cancel, stay on PHP $CURRENT_PHP_VERSION")
