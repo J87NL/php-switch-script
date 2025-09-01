@@ -122,6 +122,8 @@ if (whiptail --title "Add php.ini for PHP Versions" --yesno "Do you want to add 
             fi
         fi
     done
+
+    sudo phpenmod php
 fi
 
 echo "* Installation complete."
