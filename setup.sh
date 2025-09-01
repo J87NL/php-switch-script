@@ -1,8 +1,9 @@
 #!/bin/bash
 
 php_versions=(
+    "8.5" "PHP 8.5" OFF
     "8.4" "PHP 8.4" ON
-    "8.3" "PHP 8.3" ON
+    "8.3" "PHP 8.3" OFF
     "8.2" "PHP 8.2" OFF
     "8.1" "PHP 8.1" OFF
     "8.0" "PHP 8.0" OFF
