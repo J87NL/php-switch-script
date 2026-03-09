@@ -21,10 +21,14 @@ function change_version() {
         exit 0
     fi
 
+    echo "* Starting PHP $NEW_PHP_VERSION FPM service"
+    sudo service php${NEW_PHP_VERSION}-fpm start > /dev/null
     echo "* Enabling Apache PHP $NEW_PHP_VERSION module"
     sudo a2enconf php${NEW_PHP_VERSION}-fpm > /dev/null
     echo "* Disabling Apache PHP $CURRENT_PHP_VERSION module"
     sudo a2disconf php${CURRENT_PHP_VERSION}-fpm > /dev/null
+    echo "* Stopping PHP $CURRENT_PHP_VERSION FPM service"
+    sudo service php${CURRENT_PHP_VERSION}-fpm stop > /dev/null
     echo "* Restarting Apache..."
     sudo service apache2 restart > /dev/null
     echo "* Switching CLI PHP to $NEW_PHP_VERSION"
